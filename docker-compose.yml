@@ -3,7 +3,6 @@ version: '3.8'
 services:
   xampp-db:
     image: mariadb:10.11
-    # Remove container_name line, let docker-compose generate it
     environment:
       - MYSQL_ROOT_PASSWORD=Gustave@123
       - MYSQL_DATABASE=db_24rp14238_shareride
@@ -24,9 +23,8 @@ services:
 
   xampp-web:
     build: .
-    # Remove container_name line
     ports:
-      - "8050:80"
+      - "8600:80"       # Web app accessible on http://localhost:8600
     environment:
       - DB_HOST=xampp-db
       - DB_NAME=db_24rp14238_shareride
@@ -49,7 +47,6 @@ services:
 
   xampp-phpmyadmin:
     image: phpmyadmin:5.2
-    # Remove container_name line
     environment:
       - PMA_HOST=xampp-db
       - PMA_USER=root
@@ -57,7 +54,7 @@ services:
       - PMA_ARBITRARY=0
       - UPLOAD_LIMIT=64M
     ports:
-      - "8051:80"
+      - "8601:80"       # phpMyAdmin accessible on http://localhost:8601
     depends_on:
       xampp-db:
         condition: service_healthy
