@@ -1,53 +1,57 @@
 
+# To run the containers, use the command:
+# docker-compose up -d
+# Access the web server at http://localhost:8080
 version: '3.8'
 
 services:
-  yourregno-web:
+  xampp-web:
     build: .
-    container_name: yourregno-web
+    container_name: xampp-web
     ports:
-      - "8080:80"
+      - "8050:80"
     environment:
-      - DB_HOST=yourregno-db
-      - DB_NAME=myregnumber_shareride_db
+      - DB_HOST=xampp-db
+      - DB_NAME=xampp_shareride_db
       - DB_USER=root
-      - DB_PASSWORD=rootpassword
+      - DB_PASSWORD=Gustave@123
     depends_on:
-      - yourregno-db
-    networks:
-      - yourregno-network
-
-  yourregno-db:
-    image: mysql:8.0
-    container_name: yourregno-db
-    environment:
-      - MYSQL_ROOT_PASSWORD=rootpassword
-      - MYSQL_DATABASE=myregnumber_shareride_db
-    ports:
-      - "3306:3306"
+      - xampp-db
     volumes:
-      - yourregno-db-data:/var/lib/mysql
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./src:/var/www/html
     networks:
-      - yourregno-network
+      - xampp-network
 
-  yourregno-phpmyadmin:
-    image: phpmyadmin/phpmyadmin
-    container_name: yourregno-phpmyadmin
+  xampp-db:
+    image: mariadb:latest
+    container_name: xampp-db
     environment:
-      - PMA_HOST=yourregno-db
-      - PMA_USER=root
-      - PMA_PASSWORD=rootpassword
+      - MYSQL_ROOT_PASSWORD=Gustave@123
+      - MYSQL_DATABASE=xampp_shareride_db
     ports:
-      - "8081:80"
-    depends_on:
-      - yourregno-db
+      - "3307:3306"
+    volumes:
+      - xampp-db-data:/var/lib/mysql
     networks:
-      - yourregno-network
+      - xampp-network
+
+  xampp-phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: xampp-phpmyadmin
+    environment:
+      - PMA_HOST=xampp-db
+      - PMA_USER=root
+      - PMA_PASSWORD=Gustave@123
+    ports:
+      - "8051:80"
+    depends_on:
+      - xampp-db
+    networks:
+      - xampp-network
 
 volumes:
-  yourregno-db-data:
+  xampp-db-data:
 
 networks:
-  yourregno-network:
+  xampp-network:
     driver: bridge

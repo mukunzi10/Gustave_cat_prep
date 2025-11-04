@@ -1,9 +1,9 @@
 <?php
-// Database configuration
-$host = getenv('DB_HOST') ?: 'localhost';
-$dbname = getenv('DB_NAME') ?: '24pr14238_shareride_db';
-$username = getenv('DB_USER') ?: 'root';
-$password = getenv('DB_PASSWORD') ?: 'Gustave@123';
+// Database configuration for XAMPP
+$host = 'localhost';
+$dbname = '24pr14238_shareride_db';
+$username = 'root';
+$password = '';  // XAMPP default has no password
 
 // Create connection
 $conn = new mysqli($host, $username, $password, $dbname);
