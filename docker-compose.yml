@@ -1,7 +1,7 @@
-
-# To run the containers, use the command:
+# To run the containers:
 # docker-compose up -d
-# Access the web server at http://localhost:8080
+# Access the web server at http://localhost:8050
+
 version: '3.8'
 
 services:
@@ -21,9 +21,10 @@ services:
       - ./src:/var/www/html
     networks:
       - xampp-network
+    restart: unless-stopped
 
   xampp-db:
-    image: mariadb:latest
+    image: mariadb:10.11
     container_name: xampp-db
     environment:
       - MYSQL_ROOT_PASSWORD=Gustave@123
@@ -34,9 +35,10 @@ services:
       - xampp-db-data:/var/lib/mysql
     networks:
       - xampp-network
+    restart: unless-stopped
 
   xampp-phpmyadmin:
-    image: phpmyadmin:latest
+    image: phpmyadmin:5.2
     container_name: xampp-phpmyadmin
     environment:
       - PMA_HOST=xampp-db
@@ -48,6 +50,7 @@ services:
       - xampp-db
     networks:
       - xampp-network
+    restart: unless-stopped
 
 volumes:
   xampp-db-data:
