@@ -1,0 +1,53 @@
+
+version: '3.8'
+
+services:
+  yourregno-web:
+    build: .
+    container_name: yourregno-web
+    ports:
+      - "8080:80"
+    environment:
+      - DB_HOST=yourregno-db
+      - DB_NAME=myregnumber_shareride_db
+      - DB_USER=root
+      - DB_PASSWORD=rootpassword
+    depends_on:
+      - yourregno-db
+    networks:
+      - yourregno-network
+
+  yourregno-db:
+    image: mysql:8.0
+    container_name: yourregno-db
+    environment:
+      - MYSQL_ROOT_PASSWORD=rootpassword
+      - MYSQL_DATABASE=myregnumber_shareride_db
+    ports:
+      - "3306:3306"
+    volumes:
+      - yourregno-db-data:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - yourregno-network
+
+  yourregno-phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: yourregno-phpmyadmin
+    environment:
+      - PMA_HOST=yourregno-db
+      - PMA_USER=root
+      - PMA_PASSWORD=rootpassword
+    ports:
+      - "8081:80"
+    depends_on:
+      - yourregno-db
+    networks:
+      - yourregno-network
+
+volumes:
+  yourregno-db-data:
+
+networks:
+  yourregno-network:
+    driver: bridge
