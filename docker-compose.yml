@@ -7,7 +7,6 @@ version: '3.8'
 services:
   xampp-web:
     build: .
-    container_name: xampp-web
     ports:
       - "8050:80"
     environment:
@@ -25,7 +24,6 @@ services:
 
   xampp-db:
     image: mariadb:10.11
-    container_name: xampp-db
     environment:
       - MYSQL_ROOT_PASSWORD=Gustave@123
       - MYSQL_DATABASE=xampp_shareride_db
@@ -39,7 +37,6 @@ services:
 
   xampp-phpmyadmin:
     image: phpmyadmin:5.2
-    container_name: xampp-phpmyadmin
     environment:
       - PMA_HOST=xampp-db
       - PMA_USER=root

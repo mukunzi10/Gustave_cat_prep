@@ -51,6 +51,8 @@ pipeline {
         stage('Deploy') {
             steps {
                 echo "Deploying Docker containers..."
+                // Cleanup old containers if any
+                sh 'docker rm -f xampp-web xampp-db xampp-phpmyadmin || true'
                 sh "docker-compose -f ${DOCKER_COMPOSE_FILE} -p ${PROJECT_NAME} down || true"
                 sh "docker-compose -f ${DOCKER_COMPOSE_FILE} -p ${PROJECT_NAME} up -d --build"
                 echo "Application deployed successfully!"
