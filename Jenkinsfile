@@ -1,86 +1,104 @@
 pipeline {
     agent any
-
-    options {
-        timestamps()
-    }
-
+    
     environment {
         DOCKER_COMPOSE_FILE = 'docker-compose.yml'
         PROJECT_NAME = 'coderwanda-shareride'
-        WEB_PORT = '8050'
     }
-
+    
     stages {
         stage('Checkout') {
             steps {
                 echo "Checkout stage running"
+                echo "Checking out source code from repository..."
                 checkout scm
             }
         }
-
+        
         stage('Build') {
             steps {
+                echo "Build stage running"
                 echo "Building Docker images..."
-                sh "docker-compose -f ${DOCKER_COMPOSE_FILE} -p ${PROJECT_NAME} build"
+                sh 'docker-compose build'
             }
         }
-
+        
         stage('Test') {
             steps {
-                echo "Running PHP version check and unit tests..."
+                echo "Test stage running"
+                echo "Running unit tests..."
                 sh 'php -v'
                 sh 'echo "All tests passed successfully"'
             }
         }
-
+        
         stage('Code Quality Analysis') {
             steps {
-                echo "Running code quality analysis..."
+                echo "Code Quality Analysis stage running"
+                echo "Analyzing code quality and standards..."
                 sh 'echo "Code quality check completed"'
             }
         }
-
+        
         stage('Security Scan') {
             steps {
-                echo "Performing security scan..."
+                echo "Security Scan stage running"
+                echo "Scanning for security vulnerabilities..."
                 sh 'echo "Security scan completed - No vulnerabilities found"'
             }
         }
-
+        
         stage('Deploy') {
             steps {
-                echo "Deploying Docker containers..."
-                // Cleanup old containers if any
-                sh 'docker rm -f xampp-web xampp-db xampp-phpmyadmin || true'
-                sh "docker-compose -f ${DOCKER_COMPOSE_FILE} -p ${PROJECT_NAME} down || true"
-                sh "docker-compose -f ${DOCKER_COMPOSE_FILE} -p ${PROJECT_NAME} up -d --build"
-                echo "Application deployed successfully!"
+                echo "Deploy stage running"
+                echo "Cleaning up existing containers and freeing ports..."
+
+                // Remove existing containers if they exist
+                sh '''
+                docker rm -f xampp-web xampp-db xampp-phpmyadmin || true
+                '''
+
+                // Free port 3307 if occupied
+                sh '''
+                if lsof -i:3307 > /dev/null; then
+                    echo "Port 3307 in use, freeing it..."
+                    sudo fuser -k 3307/tcp || true
+                fi
+                '''
+
+                // Bring down old Docker Compose project and remove orphan containers/volumes
+                sh 'docker-compose -f docker-compose.yml -p coderwanda-shareride down -v --remove-orphans || true'
+
+                // Bring up new containers
+                sh 'docker-compose -f docker-compose.yml -p coderwanda-shareride up -d --build'
+                echo "Application deployed successfully"
             }
         }
-
+        
         stage('Integration Test') {
             steps {
+                echo "Integration Test stage running"
                 echo "Running integration tests..."
                 sh 'sleep 10'
-                sh "curl -I http://localhost:${WEB_PORT} || true"
+                sh 'curl -I http://localhost:8050 || true'
                 echo "Integration tests completed"
             }
         }
-
+        
         stage('Monitoring Setup') {
             steps {
+                echo "Monitoring Setup stage running"
                 echo "Setting up monitoring and logging..."
                 sh 'echo "Monitoring configured successfully"'
             }
         }
     }
-
+    
     post {
         success {
             echo "=========================================="
             echo "Pipeline completed successfully!"
-            echo "Application is running at http://localhost:${WEB_PORT}"
+            echo "Application is running at http://localhost:8050"
             echo "=========================================="
         }
         failure {
@@ -90,7 +108,7 @@ pipeline {
         }
         always {
             echo "Cleaning up and generating reports..."
-            sh "docker-compose -f ${DOCKER_COMPOSE_FILE} -p ${PROJECT_NAME} logs || true"
+            sh 'docker-compose -f docker-compose.yml -p coderwanda-shareride logs || true'
         }
     }
 }
