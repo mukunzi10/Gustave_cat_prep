@@ -1,17 +1,12 @@
-# To run the containers:
-# docker-compose up -d
-# Access the web server at http://localhost:8050
-# Access phpMyAdmin at http://localhost:8051
-
 version: '3.8'
 
 services:
   xampp-db:
     image: mariadb:10.11
-    container_name: ${PROJECT_NAME:-coderwanda-shareride}_xampp-db
+    # Remove container_name line, let docker-compose generate it
     environment:
       - MYSQL_ROOT_PASSWORD=Gustave@123
-      - MYSQL_DATABASE=xampp_shareride_db
+      - MYSQL_DATABASE=db_24rp14238_shareride
       - MYSQL_ROOT_HOST=%
     ports:
       - "3307:3306"
@@ -29,14 +24,14 @@ services:
 
   xampp-web:
     build: .
-    container_name: ${PROJECT_NAME:-coderwanda-shareride}_xampp-web
+    # Remove container_name line
     ports:
       - "8050:80"
     environment:
       - DB_HOST=xampp-db
-      - DB_NAME=xampp_shareride_db
+      - DB_NAME=db_24rp14238_shareride
       - DB_USER=root
-      - DB_PASSWORD=Gustave@123
+      - DB_PASSWORD=%
     depends_on:
       xampp-db:
         condition: service_healthy
@@ -54,7 +49,7 @@ services:
 
   xampp-phpmyadmin:
     image: phpmyadmin:5.2
-    container_name: ${PROJECT_NAME:-coderwanda-shareride}_xampp-phpmyadmin
+    # Remove container_name line
     environment:
       - PMA_HOST=xampp-db
       - PMA_USER=root
@@ -78,9 +73,7 @@ services:
 
 volumes:
   xampp-db-data:
-    name: ${PROJECT_NAME:-coderwanda-shareride}_xampp-db-data
 
 networks:
   xampp-network:
-    name: ${PROJECT_NAME:-coderwanda-shareride}_xampp-network
     driver: bridge
